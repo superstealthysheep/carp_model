@@ -1,3 +1,3 @@
-# carp_model_1
+# carp_model
 
 A model for blocking asian carp spread.
