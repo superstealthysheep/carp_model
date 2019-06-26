@@ -4,10 +4,11 @@ Measures carp spread from lake to lake over time
 #import mathplotlib.pyplot as plt
 import networkx as nx
 
-reproductive_constant = 1
+reproductive_constant = 1 
 reproductive_resolution = 1000
 r = 1 + reproductive_constant/reproductive_resolution #r should not be less than 1. Even if r=1, the populations do not grow at all.
 
+number_of_spreads_per_season = 1
 
 #((2*m*c)^2)
 
@@ -32,7 +33,7 @@ class Lake:
   def __str__(self):
     return "Value: {}, Carrying Cap: {}, Population: {}".format(self.value, self.carrying_capacity, self.population)
 
-  def calculate_fish_spread(self): #caluclates how much the lake's population will change when fish randomly spread but does NOT actually change the population.
+  def calculate_fish_spread(self): #calculates how much the lake's population will change when fish randomly spread but does NOT actually change the population.
     change_in_population = 0
     for neighbor in list(lake_graph.neighbors(self)): #for loop iterating through all of the lakes neighboring self
       #below is how many fish self will gain from its neighbors
@@ -48,10 +49,11 @@ class Lake:
 
 lake_graph = nx.Graph()
 
-lake_list = [Lake(100, 1000, 5), Lake(50, 10, 0)]
-connection_list = [(lake_list[0], lake_list[1], {"passing_probability": .1})]
+lake_dict = {"l1" : Lake(100, 1000, 5), 
+             "l2" : Lake(50, 10, 0)} #make into a dictionary! 
+connection_list = [(lake_dict["l1"], lake_dict["l2"], {"passing_probability": .1})]
 
-lake_graph.add_nodes_from(lake_list)
+lake_graph.add_nodes_from(lake_dict.values()) #the .values is so that the Lake objects, not the keys, are added to the lake_graph.
 lake_graph.add_edges_from(connection_list)
 
 for season in range(0, 100):
@@ -64,13 +66,16 @@ for season in range(0, 100):
 
   print("")
 
-
+  #fish reproduction
   for lake in lake_graph.nodes():
     for i in range(0,reproductive_resolution):
       lake.reproduce()
-    lake.calculate_fish_spread()
 
-  for lake in lake_graph.nodes():
-    lake.commit_fish_spread()
+  #fish spreading
+  for i in range(0, number_of_spreads_per_season):  
+    for lake in lake_graph.nodes():
+      lake.calculate_fish_spread()
 
+    for lake in lake_graph.nodes():
+      lake.commit_fish_spread()
 
