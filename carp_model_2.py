@@ -21,6 +21,7 @@ class Lake:
     self.change_in_population = 0 #this is used for storing values from calculate_fish_spread
 
   def reproduce(self):
+    #uses an iterative model of logistic growth
     m = (r-1)/self.carrying_capacity
 
     self.population = (r - m * self.population) * self.population
@@ -50,7 +51,7 @@ class Lake:
 lake_graph = nx.Graph()
 
 lake_dict = {"l1" : Lake(100, 1000, 5), 
-             "l2" : Lake(50, 10, 0)} #make into a dictionary! 
+             "l2" : Lake(50, 10, 0)}
 connection_list = [(lake_dict["l1"], lake_dict["l2"], {"passing_probability": .1})]
 
 lake_graph.add_nodes_from(lake_dict.values()) #the .values is so that the Lake objects, not the keys, are added to the lake_graph.
