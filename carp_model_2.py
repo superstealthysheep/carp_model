@@ -4,8 +4,10 @@ Measures carp spread from lake to lake over time
 #import mathplotlib.pyplot as plt
 import networkx as nx
 
-reproductive_constant = .01
-r = 2
+reproductive_constant = 1
+reproductive_resolution = 1000
+r = 1 + reproductive_constant/reproductive_resolution #r should not be less than 1. Even if r=1, the populations do not grow at all.
+
 
 #((2*m*c)^2)
 
@@ -47,12 +49,12 @@ class Lake:
 lake_graph = nx.Graph()
 
 lake_list = [Lake(100, 1000, 5), Lake(50, 10, 0)]
-connection_list = [(lake_list[0], lake_list[1], {"passing_probability": .01})]
+connection_list = [(lake_list[0], lake_list[1], {"passing_probability": .1})]
 
 lake_graph.add_nodes_from(lake_list)
 lake_graph.add_edges_from(connection_list)
 
-for season in range(0, 20):
+for season in range(0, 100):
 #printing lake info
   print("Season {}".format(season))
   print("="*20)
@@ -64,7 +66,8 @@ for season in range(0, 20):
 
 
   for lake in lake_graph.nodes():
-    lake.reproduce()
+    for i in range(0,reproductive_resolution):
+      lake.reproduce()
     lake.calculate_fish_spread()
 
   for lake in lake_graph.nodes():
