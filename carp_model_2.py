@@ -3,9 +3,10 @@ Measures carp spread from lake to lake over time
 """
 #import mathplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 reproductive_constant = 1 
-reproductive_resolution = 1000
+reproductive_resolution = 1 ##should only be used for iterative model of logistic growth
 r = 1 + reproductive_constant/reproductive_resolution #r should not be less than 1. Even if r=1, the populations do not grow at all.
 
 number_of_spreads_per_season = 1
@@ -21,11 +22,17 @@ class Lake:
     self.change_in_population = 0 #this is used for storing values from calculate_fish_spread
 
   def reproduce(self):
-    #uses an iterative model of logistic growth
+    """#uses an iterative model of logistic growth
     m = (r-1)/self.carrying_capacity
 
-    self.population = (r - m * self.population) * self.population
+    self.population = (r - m * self.population) * self.population"""
 
+    #uses a continuous model based on differential equations
+    r = reproductive_constant
+    c = self.population / (self.carrying_capacity - self.population)
+    t = 1
+    self.population = self.carrying_capacity * c * np.exp(r * t) / (1 + c * np.exp(r * t))
+ 
   def __repr__(self):
     return str({"value" : self.value,
             "carrying_capacity" : self.carrying_capacity,
@@ -35,7 +42,7 @@ class Lake:
     return "Value: {}, Carrying Cap: {}, Population: {}".format(self.value, self.carrying_capacity, self.population)
 
   def calculate_fish_spread(self): #calculates how much the lake's population will change when fish randomly spread but does NOT actually change the population.
-    change_in_population = 0
+    self.change_in_population = 0
     for neighbor in list(lake_graph.neighbors(self)): #for loop iterating through all of the lakes neighboring self
       #below is how many fish self will gain from its neighbors
       self.change_in_population += (neighbor.population * lake_graph.edges[neighbor, self]["passing_probability"])
