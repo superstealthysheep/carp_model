@@ -48,22 +48,30 @@ class Lake:
     self.population += self.change_in_population
     self.change_in_population = 0
 
+  def calculate_effective_value(self):
+    return self.value * (1 - self.population/self.carrying_capacity)
+
 lake_graph = nx.Graph()
 
 lake_dict = {"l1" : Lake(100, 1000, 5), 
              "l2" : Lake(50, 10, 0)}
-connection_list = [(lake_dict["l1"], lake_dict["l2"], {"passing_probability": .01})]
+connection_list = [(lake_dict["l1"], lake_dict["l2"], {"passing_probability": .1})]
 
 lake_graph.add_nodes_from(lake_dict.values()) #the .values is so that the Lake objects, not the keys, are added to the lake_graph.
 lake_graph.add_edges_from(connection_list)
 
 for season in range(0, 100):
-#printing lake info
+  total_effective_value = 0
+  for lake in lake_graph.nodes():
+    total_effective_value += lake.calculate_effective_value()
+
+  #printing lake info
   print("Season {}".format(season))
   print("="*20)
   print("Lakes:")
   for lake in lake_graph.nodes():
     print(str(lake))
+  print("Total Value: {}".format(total_effective_value))
   print("")
 
   #fish reproduction
